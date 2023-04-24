@@ -13,6 +13,9 @@ const { registerInstrumentations } = require("@opentelemetry/instrumentation");
 
 //Exporter
 module.exports = (serviceName) => {
+
+   const tracer = trace.getTracer(serviceName);
+
    const jaegerExporter = new JaegerExporter({
     
        serviceName: serviceName,
@@ -21,10 +24,11 @@ module.exports = (serviceName) => {
 
    });
 
-   const span = trace.startSpan('processTodo');
+   const span = tracer.startSpan('processTodo');
    span.setAttribute('component', 'todos');
    
    const provider = new NodeTracerProvider({
+       tracer: tracer,
        resource: new Resource({
            [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
        }),
